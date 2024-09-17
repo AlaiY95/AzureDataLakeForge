@@ -1,0 +1,98 @@
+{
+    "name": "MasterPipeline",
+    "properties": {
+        "activities": [
+            {
+                "name": "CollectDailyStockData",
+                "type": "ExecutePipeline",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "CollectDailyStockData",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            },
+            {
+                "name": "UpdateCompanyFinancials",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "CollectDailyStockData",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "UpdateCompanyFinancials",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            },
+            {
+                "name": "CalculateFinancialRatios",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "UpdateCompanyFinancials",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "CalculateFinancialRatios",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            },
+            {
+                "name": "GenerateDailyReport",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "CalculateFinancialRatios",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "GenerateDailyReport",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            }
+        ],
+        "parameters": {
+            "RunDate": {
+                "type": "string",
+                "defaultValue": {
+                    "value": "@formatDateTime(utcnow(), 'yyyy-MM-dd')",
+                    "type": "Expression"
+                }
+            }
+        },
+        "variables": {
+            "SuccessfulPipelines": {
+                "type": "Array",
+                "defaultValue": []
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2023-09-17T12:00:00Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
