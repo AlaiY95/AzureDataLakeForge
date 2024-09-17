@@ -1,0 +1,9 @@
+{
+	"name": "StockMarketAnalyzerDF",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "AZURE_PRINCIPAL_ID",
+		"tenantId": "AZURE_TENANT_ID"
+	}
+}

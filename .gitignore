@@ -1,0 +1,36 @@
+# Ignore environment Variable
+.env
+
+# Ignore the _notes folder and all its contents
+/_notes/
+
+# Ignore common system files
+.DS_Store
+Thumbs.db
+
+# Ignore Python bytecode files
+*.pyc
+__pycache__/
+
+# Ignore virtual environment folders
+venv/
+env/
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore log files
+*.log
+
+# Ignore configuration files that might contain sensitive information
+config.ini
+secrets.json
+extractor.sh
+contents.txt
+
+# Ignore build outputs
+/dist/
+/build/
+
+# Add any other project-specific files or folders you want to ignore

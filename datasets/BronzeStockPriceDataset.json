@@ -1,0 +1,33 @@
+{
+    "BronzeStockPriceDataset.json": {
+        "name": "BronzeStockPriceDataset",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AzureDataLakeStorage",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "Json",
+            "typeProperties": {
+                "location": {
+                    "type": "AzureBlobFSLocation",
+                    "fileName": {
+                        "value": "@concat(dataset().StockSymbol, '_', formatDateTime(utcnow(), 'yyyy-MM-dd'), '.json')",
+                        "type": "Expression"
+                    },
+                    "folderPath": {
+                        "value": "@concat('bronze/stock-prices/', formatDateTime(utcnow(), 'yyyy/MM/dd'))",
+                        "type": "Expression"
+                    },
+                    "fileSystem": "stock-market-data"
+                }
+            },
+            "schema": {}
+        },
+        "parameters": {
+            "StockSymbol": {
+                "type": "string"
+            }
+        }
+    }
+}
