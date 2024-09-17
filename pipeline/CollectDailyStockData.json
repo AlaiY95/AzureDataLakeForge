@@ -1,0 +1,92 @@
+{
+    "StockListDataset.json": {
+        "name": "StockListDataset",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AzureDataLakeStorage",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "Json",
+            "typeProperties": {
+                "location": {
+                    "type": "AzureBlobFSLocation",
+                    "fileName": "stock_list.json",
+                    "folderPath": "config",
+                    "fileSystem": "stock-market-data"
+                }
+            },
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "symbol": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "sector": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "AlphaVantageAPIDataset.json": {
+        "name": "AlphaVantageAPIDataset",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AlphaVantageAPI",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "RestResource",
+            "typeProperties": {
+                "relativeUrl": {
+                    "value": "@concat('query?function=TIME_SERIES_DAILY&symbol=', dataset().StockSymbol, '&apikey=', dataset().APIKey)",
+                    "type": "Expression"
+                }
+            },
+            "schema": []
+        },
+        "parameters": {
+            "StockSymbol": {
+                "type": "string"
+            },
+            "APIKey": {
+                "type": "string"
+            }
+        }
+    },
+    "BronzeStockPriceDataset.json": {
+        "name": "BronzeStockPriceDataset",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AzureDataLakeStorage",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "Json",
+            "typeProperties": {
+                "location": {
+                    "type": "AzureBlobFSLocation",
+                    "fileName": {
+                        "value": "@concat(dataset().StockSymbol, '_', formatDateTime(utcnow(), 'yyyy-MM-dd'), '.json')",
+                        "type": "Expression"
+                    },
+                    "folderPath": {
+                        "value": "@concat('bronze/stock-prices/', formatDateTime(utcnow(), 'yyyy/MM/dd'))",
+                        "type": "Expression"
+                    },
+                    "fileSystem": "stock-market-data"
+                }
+            },
+            "schema": {}
+        },
+        "parameters": {
+            "StockSymbol": {
+                "type": "string"
+            }
+        }
+    }
+}
