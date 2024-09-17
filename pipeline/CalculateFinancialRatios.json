@@ -1,0 +1,162 @@
+{
+    "name": "CalculateFinancialRatios",
+    "properties": {
+        "activities": [
+            {
+                "name": "GetCompanyList",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "JsonSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "JsonReadSettings"
+                        }
+                    },
+                    "dataset": {
+                        "referenceName": "StockListDataset",
+                        "type": "DatasetReference"
+                    },
+                    "firstRowOnly": false
+                }
+            },
+            {
+                "name": "ForEachCompany",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "GetCompanyList",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('GetCompanyList').output.value",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "CalculateRatios",
+                            "type": "DatabricksNotebook",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "notebookPath": "/Notebooks/CalculateFinancialRatios",
+                                "baseParameters": {
+                                    "company_symbol": {
+                                        "value": "@item().symbol",
+                                        "type": "Expression"
+                                    }
+                                }
+                            },
+                            "linkedServiceName": {
+                                "referenceName": "AzureDatabricks",
+                                "type": "LinkedServiceReference"
+                            }
+                        },
+                        {
+                            "name": "StoreCalculatedRatios",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "CalculateRatios",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSReadSettings",
+                                        "recursive": true,
+                                        "enablePartitionDiscovery": false
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "ParquetSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "ParquetWriteSettings"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "CalculatedRatiosCSV",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "CompanySymbol": {
+                                            "value": "@item().symbol",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "GoldFinancialRatiosDataset",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "CompanySymbol": {
+                                            "value": "@item().symbol",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {},
+        "variables": {
+            "ProcessedCompanyCount": {
+                "type": "Integer",
+                "defaultValue": 0
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2023-09-17T12:00:00Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

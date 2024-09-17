@@ -1,0 +1,37 @@
+{
+    "GoldDailyReportDataset.json": {
+        "name": "GoldDailyReportDataset",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AzureDataLakeStorage",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "DelimitedText",
+            "typeProperties": {
+                "location": {
+                    "type": "AzureBlobFSLocation",
+                    "fileName": {
+                        "value": "@concat('daily_report_', dataset().ReportDate, '.csv')",
+                        "type": "Expression"
+                    },
+                    "folderPath": {
+                        "value": "@concat('gold/daily-reports/', substring(dataset().ReportDate, 0, 4), '/', substring(dataset().ReportDate, 5, 2))",
+                        "type": "Expression"
+                    },
+                    "fileSystem": "stock-market-data"
+                },
+                "columnDelimiter": ",",
+                "escapeChar": "\\",
+                "firstRowAsHeader": true,
+                "quoteChar": "\""
+            },
+            "schema": []
+        },
+        "parameters": {
+            "ReportDate": {
+                "type": "string"
+            }
+        }
+    }
+}

@@ -1,0 +1,79 @@
+{
+    "GoldFinancialRatiosDataset.json": {
+        "name": "GoldFinancialRatiosDataset",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AzureDataLakeStorage",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "Parquet",
+            "typeProperties": {
+                "location": {
+                    "type": "AzureBlobFSLocation",
+                    "folderPath": "gold/financial-ratios",
+                    "fileSystem": "stock-market-data"
+                },
+                "compressionCodec": "snappy"
+            },
+            "schema": [
+                {
+                    "name": "symbol",
+                    "type": "UTF8"
+                },
+                {
+                    "name": "date",
+                    "type": "DATE"
+                },
+                {
+                    "name": "gross_margin_ratio",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "net_profit_margin",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "return_on_assets",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "return_on_equity",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "current_ratio",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "quick_ratio",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "debt_to_equity_ratio",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "interest_coverage_ratio",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "asset_turnover_ratio",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "inventory_turnover_ratio",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "price_to_earnings_ratio",
+                    "type": "DOUBLE"
+                },
+                {
+                    "name": "price_to_book_ratio",
+                    "type": "DOUBLE"
+                }
+            ]
+        }
+    }
+}

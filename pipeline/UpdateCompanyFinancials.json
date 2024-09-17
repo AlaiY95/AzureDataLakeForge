@@ -1,0 +1,169 @@
+{
+    "name": "UpdateCompanyFinancials",
+    "properties": {
+        "activities": [
+            {
+                "name": "GetCompanyList",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "JsonSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "JsonReadSettings"
+                        }
+                    },
+                    "dataset": {
+                        "referenceName": "StockListDataset",
+                        "type": "DatasetReference"
+                    },
+                    "firstRowOnly": false
+                }
+            },
+            {
+                "name": "ForEachCompany",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "GetCompanyList",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('GetCompanyList').output.value",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "FetchCompanyFinancials",
+                            "type": "Copy",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 3,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "RestSource",
+                                    "httpRequestTimeout": "00:01:40",
+                                    "requestInterval": "00.00:00:00.010",
+                                    "requestMethod": "GET",
+                                    "relativeUrl": {
+                                        "value": "@concat('query?function=OVERVIEW&symbol=', item().symbol, '&apikey=', pipeline().parameters.AlphaVantageAPIKey)",
+                                        "type": "Expression"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "JsonSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "JsonWriteSettings"
+                                    }
+                                },
+                                "enableStaging": false
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "AlphaVantageAPIDataset",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "APIKey": {
+                                            "value": "@pipeline().parameters.AlphaVantageAPIKey",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "BronzeCompanyFinancialsDataset",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "CompanySymbol": {
+                                            "value": "@item().symbol",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "TransformCompanyFinancials",
+                            "type": "DataFlow",
+                            "dependsOn": [
+                                {
+                                    "activity": "FetchCompanyFinancials",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataflow": {
+                                    "referenceName": "TransformCompanyFinancialsDataFlow",
+                                    "type": "DataFlowReference",
+                                    "parameters": {
+                                        "CompanySymbol": {
+                                            "value": "'@{item().symbol}'",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                "compute": {
+                                    "coreCount": 8,
+                                    "computeType": "General"
+                                },
+                                "traceLevel": "Fine"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "AlphaVantageAPIKey": {
+                "type": "string"
+            }
+        },
+        "variables": {
+            "ProcessedCompanyCount": {
+                "type": "Integer",
+                "defaultValue": 0
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2023-09-17T12:00:00Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

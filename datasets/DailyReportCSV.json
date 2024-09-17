@@ -1,0 +1,29 @@
+{
+    "DailyReportCSV.json": {
+        "name": "DailyReportCSV",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AzureDataLakeStorage",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "DelimitedText",
+            "typeProperties": {
+                "location": {
+                    "type": "AzureBlobFSLocation",
+                    "fileName": "daily_report.csv",
+                    "folderPath": {
+                        "value": "@concat('temp/daily-reports/', formatDateTime(utcnow(), 'yyyy/MM/dd'))",
+                        "type": "Expression"
+                    },
+                    "fileSystem": "stock-market-data"
+                },
+                "columnDelimiter": ",",
+                "escapeChar": "\\",
+                "firstRowAsHeader": true,
+                "quoteChar": "\""
+            },
+            "schema": []
+        }
+    }
+}
