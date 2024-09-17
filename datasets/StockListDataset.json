@@ -1,0 +1,35 @@
+{
+    "StockListDataset.json": {
+        "name": "StockListDataset",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AzureDataLakeStorage",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "Json",
+            "typeProperties": {
+                "location": {
+                    "type": "AzureBlobFSLocation",
+                    "fileName": "stock_list.json",
+                    "folderPath": "config",
+                    "fileSystem": "stock-market-data"
+                }
+            },
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "symbol": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "sector": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

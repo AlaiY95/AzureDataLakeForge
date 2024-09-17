@@ -1,0 +1,28 @@
+{
+    "AlphaVantageAPIDataset.json": {
+        "name": "AlphaVantageAPIDataset",
+        "properties": {
+            "linkedServiceName": {
+                "referenceName": "AlphaVantageAPI",
+                "type": "LinkedServiceReference"
+            },
+            "annotations": [],
+            "type": "RestResource",
+            "typeProperties": {
+                "relativeUrl": {
+                    "value": "@concat('query?function=TIME_SERIES_DAILY&symbol=', dataset().StockSymbol, '&apikey=', dataset().APIKey)",
+                    "type": "Expression"
+                }
+            },
+            "schema": []
+        },
+        "parameters": {
+            "StockSymbol": {
+                "type": "string"
+            },
+            "APIKey": {
+                "type": "string"
+            }
+        }
+    }
+}
